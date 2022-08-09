@@ -1,0 +1,169 @@
+asyncapi: '2.4.0'
+info:
+  title: Random Jokes RabbitMQ API
+  version: '1.0.0'
+  description: |
+    The random jokes API allows you to get a random joke asynchronously.
+
+    ### Check out its awesome features:
+
+    * Feature 1
+    * Feature 2
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  localhost:
+    url: localhost:5672
+    protocol: amqp
+    protocolVersion: "0.9.1"
+    description: Test broker
+    security:
+      - user-password: []
+
+defaultContentType: application/json
+
+channels:
+  joke-request:
+    description: The channel on which the random jokes app will receive requests.
+    parameters:
+      streetlightId:
+        $ref: '#/components/parameters/streetlightId'
+    publish:
+      summary: Inform about environmental lighting conditions of a particular streetlight.
+      operationId: receiveJokeRequest
+      message:
+        $ref: '#/components/messages/jokeRequest'
+  joke-response:
+    description: The channel on which the random jokes app will send response.
+    parameters:
+      streetlightId:
+        $ref: '#/components/parameters/streetlightId'
+    subscribe:
+      summary: Sends joke JSON object response.
+      operationId: sendJokeResponse
+      message:
+        $ref: '#/components/messages/jokeResponse'
+
+components:
+  messages:
+    jokeRequest:
+      name: jokeRequest
+      title: Joke Request
+      summary: Parameters/options of the joke request
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/jokeRequestPayload"
+    jokeResponse:
+      name: jokeResponse
+      title: Joke Response
+      summary: Joke response object
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/jokeResponsePayload"
+
+  schemas:
+    jokeRequestPayload:
+      type: object
+      properties:
+        format:
+          type: string
+          pattern: "^(txt|yaml|json|xml)$"
+          default: json
+          description: Format of the return type.
+        lang:
+          type: string
+          pattern: "^(en|de)$"
+          default: en
+          description: Language of the joke.
+        categories:
+          type: array
+          items:
+            type: string
+            enum:
+              - programming
+              - miscellaneous
+              - dark
+              - pun
+              - spooky
+              - christmas
+    jokeResponsePayload:
+      type: object
+      properties:
+        Error:
+          type: boolean
+        Category:
+          type: string
+        Type:
+          type: string
+        Joke:
+          type: string
+        Flags:
+          type: object
+          properties:
+            nsfw:
+              type: boolean
+            religious:
+              type: boolean
+            political:
+              type: boolean
+            racist:
+              type: boolean
+            sexist:
+              type: boolean
+            explicit:
+              type: boolean
+          required:
+            - nsfw
+            - religious
+            - political
+            - racist
+            - sexist
+            - explicit
+        Id:
+          type: integer
+        Safe:
+          type: boolean
+        Lang:
+          type: string
+        worker:
+          type: string
+        jokeString:
+          type: string
+        jokeSource:
+          type: string
+      required:
+        - Error
+        - Category
+        - Type
+        - Joke
+        - Flags
+        - Id
+        - Safe
+        - Lang
+        - worker
+        - jokeString
+        - jokeSource
+
+  securitySchemes:
+    user-password:
+      type: userPassword
+      description: Provide your username and password for authentication
+
+  parameters:
+    streetlightId:
+      description: The ID of the streetlight.
+      schema:
+        type: string
+
+  messageTraits:
+    commonHeaders:
+      headers:
+        type: object
+        properties:
+          my-app-header:
+            type: integer
+            minimum: 0
+            maximum: 100
+
