@@ -1,0 +1,4 @@
+Dockerfile*
+.git
+build-run.sh
+run-rabbit-mq.sh
