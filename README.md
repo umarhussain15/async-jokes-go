@@ -11,8 +11,10 @@ The `asyncapi.yaml` file contains the definitions of the api this application us
 
 ## Run the application
 
-* Run the script "run-rabbit-mq.sh" using `bash run-rabbit-mq.sh` to start a container of RabbitMQ with default settings
-* Then in a separate terminal run `bash build-run.sh` to start the application container.
+* First build the image with docker-compose using command `docker-compose build` in root of the repo
+* Next start both RabbitMQ and the Joke application with docker-compose: `docker-compose up ` or `docker compose up -d`
+* RabbitMQ is available at `localhost` now from your machine. To access it in other docker container you can add the
+network created by docker-compose (rabbitmq-go_default) to the container's network list.
 * Now the application is listening to the `joke-subscribe-queue` which is bound to exchange `test.go.example` with 
 routing key `joke-request`.
 * It will respond with a joke to the queue `joke-publish-queue` which is bound to the exchange `test.go.example` with 
