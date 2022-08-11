@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  jokes-app:
+    restart: on-failure  # trick to overcome the failure to connect when rabbitmq is not ready
+    build: ./jokes-app
+    command:
+      - "--uri"
+      - "amqp://guest:guest@rabbitmq:5672"
+    environment:
+      HOST: rabbitmq
+    depends_on:
+      - rabbitmq
