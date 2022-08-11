@@ -17,6 +17,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/jokes-app
 # STEP 2: build container with executable with scratch as base.
 FROM scratch
 
+# copy the ca-certificate.crt from the build stage
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
 # Copy our static executable.
 COPY --from=builder /go/bin/jokes-app /go/bin/jokes-app
 
