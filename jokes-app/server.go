@@ -39,7 +39,7 @@ var producer Producer
 var api *jokeapi.JokeAPI
 var categories []string
 
-//init go init function called on program startup
+// init go init function called on program startup
 func init() {
 	flag.Parse()
 }
@@ -94,9 +94,9 @@ func SetupCloseHandlerAndWait(consumer *Consumer, producer *Producer) {
 	<-producer.done
 }
 
-//setupPublishChannel tries to establish a connection to RabbitMQ server, open a channel, declare exchange, declare a
-//queue to publish, bind that queue to the exchange with the given routing key and finally starts listening for
-//confirmations of the published messages from the server. It will return error in case any of these operations fail
+// setupPublishChannel tries to establish a connection to RabbitMQ server, open a channel, declare exchange, declare a
+// queue to publish, bind that queue to the exchange with the given routing key and finally starts listening for
+// confirmations of the published messages from the server. It will return error in case any of these operations fail
 func setupPublishChannel() error {
 	amqpURI := *uri
 
@@ -258,9 +258,9 @@ func setupSubscribeChannel() error {
 	return nil
 }
 
-//receiveJokeRequest iterates over the amqp.Delivery channel to get messages from the queue and process them. It will
-//keep running the loop infinitely in the separate routine until the done channel in the main function is empty.
-//The done channel is set to be triggered by os.Signal received by the application
+// receiveJokeRequest iterates over the amqp.Delivery channel to get messages from the queue and process them. It will
+// keep running the loop infinitely in the separate routine until the done channel in the main function is empty.
+// The done channel is set to be triggered by os.Signal received by the application
 func receiveJokeRequest(deliveries <-chan amqp.Delivery, done chan error) {
 	cleanup := func() {
 		Log.Printf("receiveJokeRequest: subscribe channel closed")
@@ -309,7 +309,7 @@ func receiveJokeRequest(deliveries <-chan amqp.Delivery, done chan error) {
 			// prepare bytes of the json data we want to publish on the response queue
 			response, err := json.Marshal(joke)
 			if err != nil {
-				ErrLog.Printf("failed to marshall joke: %s", err)
+				ErrLog.Printf("failed to marshal joke: %s", err)
 				continue
 			}
 			//Log.Printf(string(response))
@@ -325,7 +325,7 @@ func receiveJokeRequest(deliveries <-chan amqp.Delivery, done chan error) {
 
 }
 
-//sendJokeResponse publishes the given bytes and the content-type string to publish queue.
+// sendJokeResponse publishes the given bytes and the content-type string to publish queue.
 func sendJokeResponse(ContentType string, body []byte) error {
 	if err := producer.channel.PublishWithContext(
 		context.Background(), // go context to use for this request
@@ -349,8 +349,8 @@ func sendJokeResponse(ContentType string, body []byte) error {
 	return nil
 }
 
-//getJoke calls the jokes api with the given RequestMessage parameters and generates a ResponseMessage if call
-//is successful.
+// getJoke calls the jokes api with the given RequestMessage parameters and generates a ResponseMessage if call
+// is successful.
 func getJoke(message RequestMessage) (joke ResponseMessage, err error) {
 
 	api.SetCategories(message.Categories)
@@ -372,8 +372,8 @@ func getJoke(message RequestMessage) (joke ResponseMessage, err error) {
 	return response, nil
 }
 
-//confirmHandler wait for the confirmations of the messages published to the server. It runs in a separate co-routine
-//to work async and close the handler when it receives the signal on the given channel
+// confirmHandler wait for the confirmations of the messages published to the server. It runs in a separate co-routine
+// to work async and close the handler when it receives the signal on the given channel
 func confirmHandler(done chan bool, publishes chan uint64, confirms chan amqp.Confirmation) {
 	m := make(map[uint64]bool)
 	for { // infinite for loop
